@@ -4,8 +4,7 @@ import { useEffect, useRef } from 'react'
 import { gsap } from '@/lib/gsap'
 import dynamic from 'next/dynamic'
 
-const GaitDemo = dynamic(() => import('./GaitDemo'), { ssr: false })
-const ModelViewer = dynamic(() => import('./ModelViewer'), { ssr: false })
+const GlbViewer = dynamic(() => import('./GlbViewer'), { ssr: false })
 
 const PROJECTS = [
   {
@@ -15,7 +14,9 @@ const PROJECTS = [
       'Scorpion-style hexapod with 6-DOF arm on dual ESP32s. 13 SG90 servos, tripod gait, inverse kinematics solver, MPU6050 IMU, OV2640 camera. Full firmware in C on FreeRTOS. Includes Lightsim — a native Linux simulator that compiles the unmodified firmware via HAL stubs and streams state to a Three.js frontend at 50Hz.',
     tags: ['C', 'FreeRTOS', 'ESP-IDF', 'ESP32', 'IK Solver', 'Three.js', 'WebSocket'],
     links: [{ label: 'GitHub', href: 'https://github.com/vy038/Project_Talos' }],
-    media: 'talos' as const,
+    media: 'glb' as const,
+    glbSrc: '/models/talos.glb',
+    glbUnits: 3.5,
   },
   {
     id: 'battlefit',
@@ -34,7 +35,9 @@ const PROJECTS = [
       'Semi-autonomous ping pong robot that switches between manual and auto fire modes. Control loop via ESP-NOW for wireless communication. IR sensors for ball detection and safety cutoffs. Designed for both remote control and autonomous play.',
     tags: ['C++', 'ESP32', 'ESP-NOW', 'IR Sensors', 'CAD'],
     links: [],
-    media: 'gait' as const,
+    media: 'glb' as const,
+    glbSrc: '/models/pong-bot.glb',
+    glbUnits: 3.5,
   },
   {
     id: 'martialvision',
@@ -54,8 +57,9 @@ const PROJECTS = [
       'Handheld retro-style gaming console running custom games including Pong and Galaga. Built on ESP32 with optimized graphics and input handling for low-resource hardware. Full CAD enclosure design.',
     tags: ['C++', 'ESP32', 'CAD', 'Embedded Systems', 'Display Drivers'],
     links: [],
-    media: 'image' as const,
-    imagePrompt: 'CONSOLE_IMAGE',
+    media: 'glb' as const,
+    glbSrc: '/models/game-console.glb',
+    glbUnits: 3.2,
   },
 ]
 
@@ -91,10 +95,11 @@ function ProjectCard({ project, index }: { project: (typeof PROJECTS)[0]; index:
         background: 'var(--surface)', border: '1px solid var(--border)',
         overflow: 'hidden', position: 'relative',
       }}>
-        {project.media === 'talos' ? (
-          <ModelViewer />
-        ) : project.media === 'gait' ? (
-          <GaitDemo />
+        {project.media === 'glb' ? (
+          <GlbViewer
+            src={(project as { glbSrc: string }).glbSrc}
+            units={(project as { glbUnits?: number }).glbUnits}
+          />
         ) : (
           <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#222', letterSpacing: '0.1em' }}>

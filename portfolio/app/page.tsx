@@ -6,13 +6,15 @@ import About from '@/components/About'
 import Projects from '@/components/Projects'
 import Contact from '@/components/Contact'
 
-// Hero uses Three.js Canvas — must be client-only, skip SSR
+// Three.js components — must be client-only, skip SSR
 const Hero = dynamic(() => import('@/components/Hero'), { ssr: false })
+const ArmSection = dynamic(() => import('@/components/ArmSection'), { ssr: false })
 
 export default function Home() {
   return (
     <main>
       <Hero />
+      <ArmSection />
       <SkillsStrip />
       <About />
       <Projects />
