@@ -113,17 +113,6 @@ function ProjectCard({ project, index }: { project: (typeof PROJECTS)[0]; index:
           {project.label}
         </h2>
 
-        {/* Award badge */}
-        {'award' in project && project.award && (
-          <p style={{
-            fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.1em',
-            color: 'var(--accent)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8,
-          }}>
-            <span style={{ width: 4, height: 4, background: 'var(--accent)', display: 'inline-block', borderRadius: '50%' }} />
-            {project.award}
-          </p>
-        )}
-
         <p style={{
           fontSize: 'clamp(13px, 1.3vw, 15px)', lineHeight: 1.85,
           color: 'var(--muted)', marginBottom: 22, fontWeight: 300,
