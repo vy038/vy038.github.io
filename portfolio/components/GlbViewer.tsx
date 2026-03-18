@@ -60,10 +60,16 @@ export default function GlbViewer({
         gl={{ antialias: true, alpha: false }}
         style={{ background: '#080808' }}
       >
-        <ambientLight intensity={0.35} />
-        <directionalLight position={[5, 7, 4]} intensity={1.9} />
-        <pointLight position={[-3, 2, -3]} intensity={0.5} color="#6688ff" />
-        <pointLight position={[2, -2, 2]} intensity={0.3} color="#ff8844" />
+        {/* Low ambient — keep it dark and contrasty */}
+        <ambientLight intensity={0.08} />
+        {/* Strong warm key from top-front */}
+        <directionalLight position={[3, 6, 5]} intensity={3.2} color="#fff8f0" />
+        {/* Cool blue rim from rear-left */}
+        <directionalLight position={[-5, 2, -4]} intensity={1.8} color="#3355ff" />
+        {/* Subtle orange kicker from bottom-front-right */}
+        <pointLight position={[4, -3, 3]} intensity={1.2} color="#ff6622" />
+        {/* Soft fill from above-left */}
+        <pointLight position={[-2, 5, 2]} intensity={0.5} color="#99bbff" />
         <Suspense fallback={null}>
           <Model src={src} units={units} />
         </Suspense>

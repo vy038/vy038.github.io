@@ -40,17 +40,6 @@ const PROJECTS = [
     glbUnits: 3.5,
   },
   {
-    id: 'martialvision',
-    label: 'MARTIALVISION',
-    description:
-      'Computer vision martial arts trainer using OpenCV for pose analysis. Custom sensor-equipped MicroBit gloves that visualize punch force data and stream it live into a Python GUI. Awarded Most Technical Hack at FraserHacks 2024.',
-    tags: ['Python', 'OpenCV', 'MicroBit', 'Sensors', 'GUI'],
-    links: [],
-    media: 'image' as const,
-    imagePrompt: 'MARTIALVISION_IMAGE',
-    award: 'Most Technical Hack — FraserHacks 2024',
-  },
-  {
     id: 'console',
     label: 'CUSTOM GAME CONSOLE',
     description:
