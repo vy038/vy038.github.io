@@ -4,49 +4,58 @@ import { useEffect, useRef } from 'react'
 import { gsap } from '@/lib/gsap'
 import dynamic from 'next/dynamic'
 
-// Load GaitDemo client-side only (Three.js requires browser)
 const GaitDemo = dynamic(() => import('./GaitDemo'), { ssr: false })
+const ModelViewer = dynamic(() => import('./ModelViewer'), { ssr: false })
 
 const PROJECTS = [
   {
     id: 'talos',
     label: 'TALOS HEXAPOD',
     description:
-      'Scorpion-style hexapod with 6-DOF arm built on dual ESP32s. 13 SG90 servos, tripod gait algorithm, inverse kinematics solver, MPU6050 IMU, and OV2640 camera for color detection. Full firmware written in C on FreeRTOS.',
-    tags: ['C', 'FreeRTOS', 'ESP-IDF', 'ESP32', 'Inverse Kinematics'],
+      'Scorpion-style hexapod with 6-DOF arm on dual ESP32s. 13 SG90 servos, tripod gait, inverse kinematics solver, MPU6050 IMU, OV2640 camera. Full firmware in C on FreeRTOS. Includes Lightsim — a native Linux simulator that compiles the unmodified firmware via HAL stubs and streams state to a Three.js frontend at 50Hz.',
+    tags: ['C', 'FreeRTOS', 'ESP-IDF', 'ESP32', 'IK Solver', 'Three.js', 'WebSocket'],
     links: [{ label: 'GitHub', href: 'https://github.com/vy038/Project_Talos' }],
-    media: 'image' as const,
-    imagePrompt: 'TALOS_IMAGE',
+    media: 'talos' as const,
   },
   {
-    id: 'lightsim',
-    label: 'LIGHTSIM',
+    id: 'battlefit',
+    label: 'BATTLEFIT',
     description:
-      'Compiles unmodified Talos firmware C code natively on Linux via HAL stubs. Streams servo and IMU state to a Three.js visualization at 50Hz over WebSocket. Three modes: JTAG-style debug dashboard, 2D gait view, and 3D procedural renderer.',
-    tags: ['C', 'Node.js', 'Three.js', 'WebSocket', 'CMake'],
-    links: [{ label: 'GitHub', href: 'https://github.com/vy038/Project_Talos' }],
+      'Browser-based fitness game built for TerraHacks 2025. Gamifies workouts for kids using voice commands and AI-powered feedback. Gemini-powered voice input for navigation, text-to-speech coaching cues, and real-time exercise form feedback via pose detection.',
+    tags: ['JavaScript', 'Gemini API', 'HTML/CSS', 'Voice Input', 'Canvas'],
+    links: [],
+    media: 'image' as const,
+    imagePrompt: 'BATTLEFIT_IMAGE',
+  },
+  {
+    id: 'pongbot',
+    label: 'PONG BOT',
+    description:
+      'Semi-autonomous ping pong robot that switches between manual and auto fire modes. Control loop via ESP-NOW for wireless communication. IR sensors for ball detection and safety cutoffs. Designed for both remote control and autonomous play.',
+    tags: ['C++', 'ESP32', 'ESP-NOW', 'IR Sensors', 'CAD'],
+    links: [],
     media: 'gait' as const,
-    imagePrompt: '',
   },
   {
-    id: 'orbital',
-    label: 'UW ORBITAL',
+    id: 'martialvision',
+    label: 'MARTIALVISION',
     description:
-      'Bare-metal firmware for a student CubeSat. Built CC1120 radio driver from scratch, interfacing directly with TI Hercules RM46 registers. Replaced HALCoGen-generated code with direct register access for deterministic timing.',
-    tags: ['C', 'ARM Cortex-R', 'TI RM46', 'CC1120', 'HALCoGen'],
+      'Computer vision martial arts trainer using OpenCV for pose analysis. Custom sensor-equipped MicroBit gloves that visualize punch force data and stream it live into a Python GUI. Awarded Most Technical Hack at FraserHacks 2024.',
+    tags: ['Python', 'OpenCV', 'MicroBit', 'Sensors', 'GUI'],
     links: [],
     media: 'image' as const,
-    imagePrompt: 'ORBITAL_IMAGE',
+    imagePrompt: 'MARTIALVISION_IMAGE',
+    award: 'Most Technical Hack — FraserHacks 2024',
   },
   {
-    id: 'pulse',
-    label: 'PULSE',
+    id: 'console',
+    label: 'CUSTOM GAME CONSOLE',
     description:
-      'Internal network security automation tooling built at RBC. Pipeline orchestration and automated analysis workflows for network security operations.',
-    tags: ['Python', 'Apache Airflow', 'Docker'],
+      'Handheld retro-style gaming console running custom games including Pong and Galaga. Built on ESP32 with optimized graphics and input handling for low-resource hardware. Full CAD enclosure design.',
+    tags: ['C++', 'ESP32', 'CAD', 'Embedded Systems', 'Display Drivers'],
     links: [],
     media: 'image' as const,
-    imagePrompt: 'PULSE_IMAGE',
+    imagePrompt: 'CONSOLE_IMAGE',
   },
 ]
 
@@ -56,78 +65,82 @@ function ProjectCard({ project, index }: { project: (typeof PROJECTS)[0]; index:
 
   useEffect(() => {
     if (!cardRef.current) return
-    const imageEl = cardRef.current.querySelector('.proj-image')
-    const textEl = cardRef.current.querySelector('.proj-text')
-
-    gsap.fromTo(
-      imageEl,
-      { opacity: 0, x: isEven ? -40 : 40 },
-      { opacity: 1, x: 0, duration: 0.9, ease: 'power2.out', scrollTrigger: { trigger: cardRef.current, start: 'top 78%' } }
-    )
-    gsap.fromTo(
-      textEl,
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 0.8, delay: 0.1, ease: 'power2.out', scrollTrigger: { trigger: cardRef.current, start: 'top 78%' } }
-    )
+    gsap.fromTo(cardRef.current.querySelector('.proj-img'), { opacity: 0, x: isEven ? -44 : 44 }, {
+      opacity: 1, x: 0, duration: 0.9, ease: 'power2.out',
+      scrollTrigger: { trigger: cardRef.current, start: 'top 80%' },
+    })
+    gsap.fromTo(cardRef.current.querySelector('.proj-txt'), { opacity: 0, y: 28 }, {
+      opacity: 1, y: 0, duration: 0.8, delay: 0.08, ease: 'power2.out',
+      scrollTrigger: { trigger: cardRef.current, start: 'top 80%' },
+    })
   }, [isEven])
 
   return (
-    <div
-      ref={cardRef}
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: 'clamp(40px, 6vw, 80px)',
-        padding: 'clamp(60px, 10vh, 100px) clamp(32px, 6vw, 96px)',
-        borderBottom: '1px solid var(--border)',
-        direction: isEven ? 'ltr' : 'rtl',
-        alignItems: 'center',
-      }}
-      className="proj-card"
-    >
-      <style>{`
-        @media (max-width: 768px) {
-          .proj-card { grid-template-columns: 1fr !important; direction: ltr !important; }
-        }
-      `}</style>
+    <div ref={cardRef} className="proj-card" style={{
+      display: 'grid', gridTemplateColumns: '1fr 1fr',
+      gap: 'clamp(40px, 6vw, 80px)',
+      padding: 'clamp(60px, 10vh, 96px) clamp(32px, 6vw, 96px)',
+      borderBottom: '1px solid var(--border)',
+      direction: isEven ? 'ltr' : 'rtl', alignItems: 'center',
+    }}>
+      <style>{`.proj-card{} @media(max-width:768px){.proj-card{grid-template-columns:1fr!important;direction:ltr!important}}`}</style>
 
       {/* Media */}
-      <div
-        className="proj-image"
-        style={{
-          direction: 'ltr',
-          aspectRatio: '16/10',
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          overflow: 'hidden',
-          position: 'relative',
-        }}
-      >
-        {project.media === 'gait' ? (
+      <div className="proj-img" style={{
+        direction: 'ltr', aspectRatio: '16/10',
+        background: 'var(--surface)', border: '1px solid var(--border)',
+        overflow: 'hidden', position: 'relative',
+      }}>
+        {project.media === 'talos' ? (
+          <ModelViewer />
+        ) : project.media === 'gait' ? (
           <GaitDemo />
         ) : (
           <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#2a2a2a', letterSpacing: '0.1em' }}>
-              [{project.imagePrompt}]
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#222', letterSpacing: '0.1em' }}>
+              [{(project as { imagePrompt?: string }).imagePrompt}]
             </span>
           </div>
         )}
       </div>
 
       {/* Text */}
-      <div className="proj-text" style={{ direction: 'ltr' }}>
-        <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.16em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 14 }}>
+      <div className="proj-txt" style={{ direction: 'ltr' }}>
+        <p style={{
+          fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.16em',
+          color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 12,
+        }}>
           0{index + 1}
         </p>
-        <h2 style={{ fontSize: 'clamp(22px, 2.8vw, 36px)', fontWeight: 300, letterSpacing: '-0.01em', marginBottom: 20, color: 'var(--text)' }}>
+        <h2 style={{
+          fontSize: 'clamp(22px, 2.8vw, 36px)', fontWeight: 300,
+          letterSpacing: '-0.01em', marginBottom: 16, color: 'var(--text)',
+        }}>
           {project.label}
         </h2>
-        <p style={{ fontSize: 'clamp(13px, 1.3vw, 15px)', lineHeight: 1.8, color: 'var(--muted)', marginBottom: 24, fontWeight: 300 }}>
+
+        {/* Award badge */}
+        {'award' in project && project.award && (
+          <p style={{
+            fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.1em',
+            color: 'var(--accent)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            <span style={{ width: 4, height: 4, background: 'var(--accent)', display: 'inline-block', borderRadius: '50%' }} />
+            {project.award}
+          </p>
+        )}
+
+        <p style={{
+          fontSize: 'clamp(13px, 1.3vw, 15px)', lineHeight: 1.85,
+          color: 'var(--muted)', marginBottom: 22, fontWeight: 300,
+        }}>
           {project.description}
         </p>
 
-        {/* Tags */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 0', marginBottom: 28, fontFamily: 'var(--font-mono)', fontSize: 11, color: '#444', letterSpacing: '0.06em' }}>
+        <div style={{
+          display: 'flex', flexWrap: 'wrap', gap: '6px 0', marginBottom: 24,
+          fontFamily: 'var(--font-mono)', fontSize: 11, color: '#3a3a3a', letterSpacing: '0.05em',
+        }}>
           {project.tags.map((tag, i) => (
             <span key={tag}>
               {tag}
@@ -136,18 +149,16 @@ function ProjectCard({ project, index }: { project: (typeof PROJECTS)[0]; index:
           ))}
         </div>
 
-        {/* Links */}
-        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 16 }}>
           {project.links.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.1em', color: 'var(--muted)', padding: '9px 0', borderBottom: '1px solid var(--border)', transition: 'color 0.2s, border-color 0.2s' }}
+            <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer"
+              style={{
+                fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.1em',
+                color: 'var(--muted)', padding: '8px 0', borderBottom: '1px solid var(--border)',
+                transition: 'color 0.2s, border-color 0.2s',
+              }}
               onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.borderColor = 'var(--muted)' }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--muted)'; e.currentTarget.style.borderColor = 'var(--border)' }}
-            >
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--muted)'; e.currentTarget.style.borderColor = 'var(--border)' }}>
               {link.label} ↗
             </a>
           ))}
@@ -162,20 +173,27 @@ export default function Projects() {
 
   useEffect(() => {
     if (!headerRef.current) return
-    gsap.fromTo(
-      headerRef.current,
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', scrollTrigger: { trigger: headerRef.current, start: 'top 85%' } }
-    )
+    gsap.fromTo(headerRef.current, { opacity: 0, y: 20 }, {
+      opacity: 1, y: 0, duration: 0.7, ease: 'power2.out',
+      scrollTrigger: { trigger: headerRef.current, start: 'top 85%' },
+    })
   }, [])
 
   return (
     <section style={{ borderTop: '1px solid var(--border)' }}>
-      <div ref={headerRef} style={{ padding: 'clamp(60px, 8vh, 80px) clamp(32px, 6vw, 96px) 0', opacity: 0 }}>
-        <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.16em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 12 }}>
+      <div ref={headerRef} style={{
+        padding: 'clamp(60px, 8vh, 80px) clamp(32px, 6vw, 96px) 0', opacity: 0,
+      }}>
+        <p style={{
+          fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.16em',
+          color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 12,
+        }}>
           Work
         </p>
-        <h2 style={{ fontSize: 'clamp(32px, 4vw, 52px)', fontWeight: 300, letterSpacing: '-0.02em', color: 'var(--text)' }}>
+        <h2 style={{
+          fontSize: 'clamp(32px, 4vw, 52px)', fontWeight: 300,
+          letterSpacing: '-0.02em', color: 'var(--text)',
+        }}>
           Projects
         </h2>
       </div>
