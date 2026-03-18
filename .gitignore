@@ -3,5 +3,6 @@ node_modules/
 dist/
 coverage/
 
-# Allow portfolio's lock file for CI
+# Allow portfolio manifests for CI
+!portfolio/package.json
 !portfolio/package-lock.json
