@@ -1,45 +1,60 @@
 'use client'
 
-import { useEffect, useRef, Suspense, useMemo } from 'react'
+import { useEffect, useRef, useCallback, Suspense, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
-import { gsap, ScrollTrigger } from '@/lib/gsap'
+import { gsap } from '@/lib/gsap'
 import { useMeshMode } from './MeshModeContext'
+import StudioEnv from './StudioEnv'
 
-const WIRE_COLOR = new THREE.Color(0x1155ff)
-const WIRE_EMISSIVE = new THREE.Color(0x001133)
-const SOLID_COLOR = new THREE.Color(0x1c1c1c)
-const SOLID_EMISSIVE = new THREE.Color(0x000000)
+function normalizeAndCenter(scene: THREE.Object3D, units: number) {
+  scene.position.set(0, 0, 0)
+  scene.scale.set(1, 1, 1)
+  scene.updateMatrixWorld(true)
 
-function normalizeScene(scene: THREE.Object3D, units: number) {
   const box = new THREE.Box3().setFromObject(scene)
   const size = box.getSize(new THREE.Vector3())
   const maxDim = Math.max(size.x, size.y, size.z)
   if (maxDim > 0) scene.scale.setScalar(units / maxDim)
-  box.setFromObject(scene)
-  scene.position.sub(box.getCenter(new THREE.Vector3()))
+
+  scene.updateMatrixWorld(true)
+  const box2 = new THREE.Box3().setFromObject(scene)
+  const center = box2.getCenter(new THREE.Vector3())
+  scene.position.set(-center.x, -center.y, -center.z)
 }
 
-function applyMode(scene: THREE.Object3D, meshMode: boolean) {
+function setChromeMaterial(scene: THREE.Object3D) {
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      child.material = new THREE.MeshStandardMaterial({
+        color: 0x222222,
+        metalness: 0.92,
+        roughness: 0.12,
+      })
+    }
+  })
+}
+
+function applyMeshMode(scene: THREE.Object3D, meshMode: boolean) {
   scene.traverse((child) => {
     if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
       if (meshMode) {
         child.material.wireframe = true
-        child.material.color.copy(WIRE_COLOR)
-        child.material.emissive.copy(WIRE_EMISSIVE)
+        child.material.color.set(0x1155ff)
+        child.material.emissive.set(0x001133)
         child.material.emissiveIntensity = 1.4
         child.material.metalness = 0
         child.material.roughness = 1
-        child.material.transparent = false
-        child.material.opacity = 1
+        child.material.envMapIntensity = 0
       } else {
         child.material.wireframe = false
-        child.material.color.copy(SOLID_COLOR)
-        child.material.emissive.copy(SOLID_EMISSIVE)
+        child.material.color.set(0x222222)
+        child.material.emissive.set(0x000000)
         child.material.emissiveIntensity = 0
-        child.material.metalness = 0.85
-        child.material.roughness = 0.22
+        child.material.metalness = 0.92
+        child.material.roughness = 0.12
+        child.material.envMapIntensity = 1
       }
     }
   })
@@ -54,49 +69,39 @@ function ArmModel({ scrollRef, meshMode }: { scrollRef: React.RefObject<number>;
   const groupRef = useRef<THREE.Group>(null)
 
   useEffect(() => {
-    normalizeScene(scene, 5)
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        child.material = new THREE.MeshStandardMaterial({
-          color: SOLID_COLOR.clone(), metalness: 0.85, roughness: 0.22,
-          emissive: SOLID_EMISSIVE.clone(), emissiveIntensity: 0,
-        })
-      }
-    })
+    normalizeAndCenter(scene, 6)
+    setChromeMaterial(scene)
   }, [scene])
 
-  useEffect(() => { applyMode(scene, meshMode) }, [scene, meshMode])
+  useEffect(() => { applyMeshMode(scene, meshMode) }, [scene, meshMode])
 
   useFrame(() => {
     if (!groupRef.current) return
     const p = scrollRef.current ?? 0
 
-    const slideP = Math.min(p / 0.4, 1)
-    const x = THREE.MathUtils.lerp(9, 0, easeOut(slideP))
+    // Sweep right → center → left (stays within canvas bounds more)
+    const x = THREE.MathUtils.lerp(5, -5, easeOut(p))
+    const rotY = p * Math.PI * 1.2
+    const fade = p < 0.8 ? 1 : 1 - easeIn((p - 0.8) / 0.2)
 
-    const rotP = Math.max(0, Math.min((p - 0.4) / 0.3, 1))
-    const rotY = rotP * Math.PI * 1.5
-
-    const exitP = Math.max(0, Math.min((p - 0.7) / 0.3, 1))
-    const y = THREE.MathUtils.lerp(0, -4.5, easeIn(exitP))
-    const exitX = THREE.MathUtils.lerp(0, -3, easeIn(exitP))
-
-    groupRef.current.position.set(x + exitX, y, 0)
+    groupRef.current.position.x = x
+    groupRef.current.position.y = 0
+    groupRef.current.rotation.x = 0.1
     groupRef.current.rotation.y = rotY
+    groupRef.current.rotation.z = 0
 
     if (!meshMode) {
-      const opacity = 1 - easeIn(exitP)
       groupRef.current.traverse((child) => {
         if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
-          child.material.transparent = true
-          child.material.opacity = opacity
+          child.material.transparent = fade < 1
+          child.material.opacity = fade
         }
       })
     }
   })
 
   return (
-    <group ref={groupRef} position={[9, 0, 0]} rotation={[0.15, 0, 0]}>
+    <group ref={groupRef}>
       <primitive object={scene} />
     </group>
   )
@@ -108,44 +113,46 @@ function LegsModel({ scrollRef, meshMode }: { scrollRef: React.RefObject<number>
   const groupRef = useRef<THREE.Group>(null)
 
   useEffect(() => {
-    normalizeScene(scene, 7)
+    normalizeAndCenter(scene, 7)
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         child.material = new THREE.MeshStandardMaterial({
-          color: SOLID_COLOR.clone(), metalness: 0.85, roughness: 0.22,
-          emissive: SOLID_EMISSIVE.clone(), emissiveIntensity: 0,
+          color: 0x222222, metalness: 0.92, roughness: 0.12,
           transparent: true, opacity: 0,
         })
       }
     })
   }, [scene])
 
-  useEffect(() => { applyMode(scene, meshMode) }, [scene, meshMode])
+  useEffect(() => { applyMeshMode(scene, meshMode) }, [scene, meshMode])
 
   useFrame(() => {
     if (!groupRef.current) return
     const p = scrollRef.current ?? 0
 
-    const fadeInP = Math.max(0, Math.min((p - 0.65) / 0.15, 1))
-    const slideP = Math.max(0, Math.min((p - 0.65) / 0.35, 1))
-    const y = THREE.MathUtils.lerp(-3.5, -1.2, easeOut(slideP))
-    const tiltX = THREE.MathUtils.lerp(0.3, -0.1, easeOut(slideP))
+    const enterP = Math.max(0, Math.min((p - 0.6) / 0.4, 1))
+    const x = THREE.MathUtils.lerp(5, -1, easeOut(enterP))
+    const fade = easeOut(Math.max(0, Math.min((p - 0.6) / 0.15, 1)))
+    const tilt = THREE.MathUtils.lerp(0.4, 0.1, easeOut(enterP))
 
-    groupRef.current.position.set(1.5, y, 0)
-    groupRef.current.rotation.x = tiltX
+    groupRef.current.position.x = x
+    groupRef.current.position.y = -0.5
+    groupRef.current.rotation.x = tilt
+    groupRef.current.rotation.y = THREE.MathUtils.lerp(0.3, -0.2, easeOut(enterP))
+    groupRef.current.rotation.z = 0
 
     if (!meshMode) {
       groupRef.current.traverse((child) => {
         if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
-          child.material.transparent = true
-          child.material.opacity = fadeInP
+          child.material.transparent = fade < 1
+          child.material.opacity = fade
         }
       })
     }
   })
 
   return (
-    <group ref={groupRef} position={[1.5, -3.5, 0]} rotation={[0.3, 0.4, 0]}>
+    <group ref={groupRef}>
       <primitive object={scene} />
     </group>
   )
@@ -157,25 +164,36 @@ export default function ArmSection() {
   const labelRef = useRef<HTMLDivElement>(null)
   const { meshMode } = useMeshMode()
 
-  useEffect(() => {
+  // Native scroll listener — bypasses GSAP ScrollTrigger for 3D progress
+  const handleScroll = useCallback(() => {
     if (!sectionRef.current) return
+    const rect = sectionRef.current.getBoundingClientRect()
+    const sectionHeight = sectionRef.current.offsetHeight
+    const viewportH = window.innerHeight
+    const scrollable = sectionHeight - viewportH
+    if (scrollable <= 0) return
+    const scrolled = -rect.top
+    scrollRef.current = Math.max(0, Math.min(1, scrolled / scrollable))
+  }, [])
 
-    ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: 'top top',
-      end: 'bottom top',
-      scrub: 1.4,
-      onUpdate: (self) => { scrollRef.current = self.progress },
-    })
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [handleScroll])
 
-    gsap.fromTo(labelRef.current,
+  // Label animations — still use GSAP for text
+  useEffect(() => {
+    if (!labelRef.current || !sectionRef.current) return
+
+    const labelIn = gsap.fromTo(labelRef.current,
       { opacity: 0, y: 12 },
       {
         opacity: 1, y: 0, duration: 0.6, ease: 'power2.out',
         scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
       }
     )
-    gsap.to(labelRef.current, {
+    const labelOut = gsap.to(labelRef.current, {
       opacity: 0, y: -12,
       scrollTrigger: {
         trigger: sectionRef.current,
@@ -184,6 +202,13 @@ export default function ArmSection() {
         scrub: true,
       },
     })
+
+    return () => {
+      labelIn.scrollTrigger?.kill()
+      labelIn.kill()
+      labelOut.scrollTrigger?.kill()
+      labelOut.kill()
+    }
   }, [])
 
   return (
@@ -196,28 +221,28 @@ export default function ArmSection() {
           pointerEvents: 'none', zIndex: 2,
         }} />
 
-        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none' }}>
           <Canvas
-            camera={{ position: [0, 1.5, 8], fov: 50 }}
-            gl={{ antialias: true, alpha: true }}
-            style={{ background: 'transparent' }}
+            camera={{ position: [0, 0.5, 9], fov: 55 }}
+            gl={{ antialias: true, alpha: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }}
+            style={{ width: '100%', height: '100%', background: 'transparent' }}
           >
+            <StudioEnv intensity={0.6} />
+
             {meshMode ? (
               <>
-                <ambientLight intensity={0.04} color="#0022aa" />
-                <directionalLight position={[6, 8, 4]} intensity={0.3} color="#2244ff" />
-                <pointLight position={[-4, 1, -4]} intensity={1.2} color="#0055ff" />
-                <pointLight position={[4, -2, 3]} intensity={0.6} color="#3366ff" />
+                <ambientLight intensity={0.06} color="#0022aa" />
+                <pointLight position={[-4, 1, -4]} intensity={1.4} color="#0055ff" />
+                <pointLight position={[4, -2, 3]} intensity={0.7} color="#3366ff" />
               </>
             ) : (
               <>
-                <ambientLight intensity={0.18} />
-                <directionalLight position={[6, 8, 4]} intensity={2.4} />
-                <directionalLight position={[-4, 1, -5]} intensity={1.1} color="#3355ff" />
-                <pointLight position={[3, -3, 2]} intensity={0.9} color="#ff5522" />
-                <pointLight position={[-2, 4, 2]} intensity={0.4} color="#aaccff" />
+                <ambientLight intensity={0.15} />
+                <directionalLight position={[4, 6, 5]} intensity={1.5} />
+                <directionalLight position={[-5, 2, -5]} intensity={1.2} color="#4466ff" />
               </>
             )}
+
             <Suspense fallback={null}>
               <ArmModel scrollRef={scrollRef} meshMode={meshMode} />
               <LegsModel scrollRef={scrollRef} meshMode={meshMode} />
@@ -245,8 +270,8 @@ export default function ArmSection() {
             fontSize: 'clamp(13px, 1.3vw, 16px)', fontWeight: 300,
             color: 'var(--muted)', lineHeight: 1.7, maxWidth: 260,
           }}>
-            6-DOF arm<br />
-            <span style={{ fontSize: '0.88em' }}>18 degrees of freedom total</span>
+            3-axis arm<br />
+            <span style={{ fontSize: '0.88em' }}>13 servos · scorpion configuration</span>
           </p>
         </div>
       </div>

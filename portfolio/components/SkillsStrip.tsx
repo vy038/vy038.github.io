@@ -4,9 +4,9 @@ import { useEffect, useRef } from 'react'
 import { gsap } from '@/lib/gsap'
 
 const SKILLS = [
-  'C++', 'Java', 'JavaScript', 'SQL',
-  'ESP32', 'Arduino', 'PCB Design', 'Circuit Design',
-  'Docker', 'Redis', 'Linux', 'Git',
+  'Bare-metal C', 'C++', 'ARM Cortex-R', 'ESP32', 'FreeRTOS',
+  'I2C', 'SPI', 'UART', 'PWM',
+  'Python', 'Java', 'Docker', 'Git', 'Linux',
 ]
 
 export default function SkillsStrip() {
