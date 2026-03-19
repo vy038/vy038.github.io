@@ -65,7 +65,7 @@ export default function Contact() {
           opacity: 0,
         }}
       >
-        Let&apos;s talk.
+        Connect with me.
       </h2>
 
       <a
