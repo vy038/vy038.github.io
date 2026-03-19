@@ -15,8 +15,8 @@ const TIMELINE = [
     year: 'Jan 2026 – Apr 2026',
     company: 'RBC',
     role: 'Automation Analyst — Network Global Security SRE',
-    desc: 'Pulse device provisioning platform in Python. CLI agent for hardware probing with ServiceNow/Active Directory integration.',
-    tags: 'Python · MongoDB · PostgreSQL · ServiceNow',
+    desc: 'Automating device configuration and monitoring with Python scripts and Airflow DAGs. Developed data pipeline for device onboarding, increasing data reliability by 90-95%.',
+    tags: 'Python · MongoDB · PostgreSQL · Airflow',
   },
   {
     year: 'May – Aug 2025',
