@@ -15,7 +15,7 @@ const TIMELINE = [
     year: 'Jan 2026 – Apr 2026',
     company: 'RBC',
     role: 'Automation Analyst — Network Global Security SRE',
-    desc: 'Automating device configuration and monitoring with Python scripts and Airflow DAGs. Developed data pipeline for device onboarding, increasing data reliability by 90-95%.',
+    desc: 'Automating device configuration and monitoring with Python scripts and Airflow DAGs. Developed data pipeline for device onboarding, increasing data reliability by 90–95%.',
     tags: 'Python · MongoDB · PostgreSQL · Airflow',
   },
   {
@@ -33,7 +33,6 @@ const TIMELINE = [
     tags: 'Arduino · Embedded · Robotics',
   },
 ]
-
 
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -63,11 +62,13 @@ export default function About() {
       <style>{`
         .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(48px, 8vw, 120px); align-items: start; margin-bottom: clamp(60px, 8vh, 100px); }
         @media(max-width:768px){ .about-grid{ grid-template-columns:1fr!important; } }
+        .about-left { opacity: 0; }
+        .timeline-item { opacity: 0; }
       `}</style>
 
       <div className="about-grid">
         {/* Experience timeline */}
-        <div className="timeline-col about-left" style={{ opacity: 0 }}>
+        <div className="timeline-col about-left">
           <p style={{
             fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.16em',
             color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 28,
@@ -84,7 +85,7 @@ export default function About() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
               {TIMELINE.map((item) => (
-                <div key={item.company} className="timeline-item" style={{ position: 'relative', opacity: 0 }}>
+                <div key={item.company} className="timeline-item" style={{ position: 'relative' }}>
                   <div style={{
                     position: 'absolute', left: -18, top: 7,
                     width: 6, height: 6, borderRadius: '50%',
@@ -105,8 +106,8 @@ export default function About() {
           </div>
         </div>
 
-        {/* Education + About */}
-        <div className="about-left" style={{ opacity: 0 }}>
+        {/* Education + Focus */}
+        <div className="about-left">
           <p style={{
             fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.16em',
             color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 28,
@@ -119,7 +120,7 @@ export default function About() {
           <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 4 }}>
             BASc in Computer Engineering
           </p>
-          <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#3a3a3a', marginBottom: 6 }}>
+          <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#555', marginBottom: 6 }}>
             Sep 2025 – May 2030 · 87.4% (3.81/4.0)
           </p>
 

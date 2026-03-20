@@ -29,6 +29,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         <meta name="darkreader-lock" />
+        {/* Runs before any bundle — prevents browser scroll restoration from briefly showing off-screen content */}
+        <script dangerouslySetInnerHTML={{ __html: "history.scrollRestoration='manual';window.scrollTo(0,0);" }} />
       </head>
       <body suppressHydrationWarning>{children}</body>
     </html>

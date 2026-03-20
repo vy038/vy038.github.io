@@ -7,12 +7,16 @@ import Projects from '@/components/Projects'
 import Contact from '@/components/Contact'
 
 // Three.js components — must be client-only, skip SSR
-const Hero = dynamic(() => import('@/components/Hero'), { ssr: false })
+// Loading placeholder holds the space so below-fold sections don't flash to top
+const Hero = dynamic(() => import('@/components/Hero'), {
+  ssr: false,
+  loading: () => <div style={{ height: '700vh', background: '#080808' }} />,
+})
 
 export default function Home() {
   return (
     <main>
-      <Hero />
+<Hero />
       <SkillsStrip />
       <About />
       <Projects />

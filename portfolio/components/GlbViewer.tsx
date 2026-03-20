@@ -5,6 +5,26 @@ import { Canvas } from '@react-three/fiber'
 import { useGLTF, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
+function applyMeshMaterial(scene: THREE.Object3D, meshMode: boolean) {
+  scene.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      const mat = child.material instanceof THREE.MeshStandardMaterial
+        ? child.material
+        : (() => { const m = new THREE.MeshStandardMaterial(); child.material = m; return m })()
+      if (meshMode) {
+        mat.wireframe = true; mat.color.set(0xffffff)
+        mat.emissive.set(0x000000); mat.emissiveIntensity = 0
+        mat.metalness = 0; mat.roughness = 1
+      } else {
+        mat.wireframe = false; mat.color.set(0xc0c0c0)
+        mat.emissive.set(0x000000); mat.emissiveIntensity = 0
+        mat.metalness = 0.15; mat.roughness = 0.8
+      }
+      mat.needsUpdate = true
+    }
+  })
+}
+
 function Model({ src, units, meshMode }: { src: string; units: number; meshMode: boolean }) {
   const { scene: raw } = useGLTF(src)
 
@@ -20,41 +40,17 @@ function Model({ src, units, meshMode }: { src: string; units: number; meshMode:
     scene.updateMatrixWorld(true)
     const box2 = new THREE.Box3().setFromObject(scene)
     const center = box2.getCenter(new THREE.Vector3())
-    // Base materials applied once here
+    // Replace ALL materials immediately so first render has no GLB color flash
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        child.material = new THREE.MeshStandardMaterial({
-          color: 0xc0c0c0,
-          metalness: 0.15,
-          roughness: 0.8,
-        })
+        child.material = new THREE.MeshStandardMaterial({ color: 0xffffff, wireframe: true, metalness: 0, roughness: 1 })
       }
     })
     return { scene, offset: new THREE.Vector3(-center.x, -center.y, -center.z) }
   }, [raw, units])
 
   // Reactively apply mesh/solid mode without re-cloning
-  useEffect(() => {
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
-        if (meshMode) {
-          child.material.wireframe = true
-          child.material.color.set(0xffffff)
-          child.material.emissive.set(0x000000)
-          child.material.emissiveIntensity = 0
-          child.material.metalness = 0
-          child.material.roughness = 1
-        } else {
-          child.material.wireframe = false
-          child.material.color.set(0xc0c0c0)
-          child.material.emissive.set(0x000000)
-          child.material.emissiveIntensity = 0
-          child.material.metalness = 0.15
-          child.material.roughness = 0.8
-        }
-      }
-    })
-  }, [scene, meshMode])
+  useEffect(() => { applyMeshMaterial(scene, meshMode) }, [scene, meshMode])
 
   return (
     <group position={offset}>

@@ -81,10 +81,10 @@ function ProjectCard({ project, index }: { project: (typeof PROJECTS)[0]; index:
     }}>
       <style>{`.proj-card{} @media(max-width:768px){.proj-card{grid-template-columns:1fr!important;direction:ltr!important}}`}</style>
 
-      {/* Media */}
+      {/* Media — no border, bleeds into page background */}
       <div className="proj-img" style={{
         direction: 'ltr', aspectRatio: '16/10',
-        background: 'var(--surface)', border: '1px solid var(--border)',
+        background: '#080808',
         overflow: 'hidden', position: 'relative',
       }}>
         {project.media === 'glb' ? (
