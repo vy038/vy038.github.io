@@ -5,7 +5,7 @@
   --surface: #111111;
   --border: #1e1e1e;
   --text: #e8e8e8;
-  --muted: #888888;
+  --muted: #aaaaaa;
   --accent: #00ff88;
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -38,4 +38,10 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  * { -webkit-tap-highlight-color: transparent; }
+  body { touch-action: pan-y; }
 }

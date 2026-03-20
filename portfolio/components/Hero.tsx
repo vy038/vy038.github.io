@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback, Suspense, useMemo } from 'react'
+import { useEffect, useRef, useCallback, Suspense, useMemo, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
@@ -208,6 +208,15 @@ export default function Hero() {
   const overlayRef    = useRef<HTMLDivElement>(null)   // black exit overlay
   const fadeInRef     = useRef<HTMLDivElement>(null)   // mount fade-in (black→clear)
   const scrollIndicatorRef = useRef<HTMLDivElement>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
   const handleScroll = useCallback(() => {
     if (!sectionRef.current) return
     const rect = sectionRef.current.getBoundingClientRect()
@@ -269,7 +278,7 @@ export default function Hero() {
   }, [handleScroll])
 
   return (
-    <section ref={sectionRef} style={{ height: '480vh', position: 'relative' }}>
+    <section ref={sectionRef} style={{ height: isMobile ? '300vh' : '700vh', position: 'relative' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
 
         {/* ── 3D canvas ── */}
@@ -309,8 +318,8 @@ export default function Hero() {
 
         {/* ── nav ── */}
         <nav style={{
-          position: 'absolute', top: 32, right: 40,
-          display: 'flex', gap: 28, fontSize: 13,
+          position: 'absolute', top: isMobile ? 20 : 32, right: isMobile ? 20 : 40,
+          display: 'flex', gap: isMobile ? 16 : 28, fontSize: isMobile ? 11 : 13,
           letterSpacing: '0.04em', zIndex: 10,
         }}>
           {[
@@ -329,8 +338,8 @@ export default function Hero() {
 
         {/* ── hero name/title — bottom-left, fades out on first scroll ── */}
         <div ref={heroTextRef} style={{
-          position: 'absolute', bottom: '18%',
-          left: 'clamp(32px, 6vw, 96px)', zIndex: 3,
+          position: 'absolute', bottom: isMobile ? '14%' : '18%',
+          left: isMobile ? 20 : 'clamp(32px, 6vw, 96px)', zIndex: 3,
         }}>
           <p style={{
             fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: '0.18em',
@@ -339,13 +348,13 @@ export default function Hero() {
             Portfolio
           </p>
           <h1 style={{
-            fontSize: 'clamp(64px, 9vw, 120px)', fontWeight: 300,
+            fontSize: 'clamp(44px, 11vw, 120px)', fontWeight: 300,
             lineHeight: 0.92, letterSpacing: '-0.025em', marginBottom: 20,
           }}>
             Victor<br />Yu
           </h1>
           <p style={{
-            fontSize: 'clamp(13px, 1.4vw, 17px)', fontWeight: 300,
+            fontSize: 'clamp(12px, 1.4vw, 17px)', fontWeight: 300,
             color: 'var(--muted)', lineHeight: 1.7,
           }}>
             Firmware &amp; Embedded Systems<br />
@@ -353,10 +362,11 @@ export default function Hero() {
           </p>
         </div>
 
-        {/* ── "Talos Hexapod" — hero screen right side, fades at first scroll ── */}
+        {/* ── "Talos Hexapod" — hero screen right side, hidden on mobile ── */}
         <div ref={heroTagRef} style={{
           position: 'absolute', bottom: '18%', right: 'clamp(32px, 6vw, 96px)',
           zIndex: 3, textAlign: 'right', pointerEvents: 'none',
+          display: isMobile ? 'none' : 'block',
         }}>
           <p style={{
             fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.20em',
@@ -375,8 +385,10 @@ export default function Hero() {
 
         {/* ── ESP32-CAM text — appears during zoom-in to front ── */}
         <div ref={camTextRef} style={{
-          position: 'absolute', bottom: '18%', right: 'clamp(32px, 6vw, 96px)',
-          zIndex: 3, opacity: 0, textAlign: 'right', pointerEvents: 'none',
+          position: 'absolute', zIndex: 3, opacity: 0, pointerEvents: 'none',
+          ...(isMobile
+            ? { bottom: '6%', left: '50%', transform: 'translateX(-50%)', textAlign: 'center', width: '80vw' }
+            : { bottom: '18%', right: 'clamp(32px, 6vw, 96px)', textAlign: 'right' }),
         }}>
           <p style={{
             fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.20em',
@@ -396,8 +408,10 @@ export default function Hero() {
 
         {/* ── Legs text — appears during orbit phase ── */}
         <div ref={legsTextRef} style={{
-          position: 'absolute', bottom: '18%', right: 'clamp(32px, 6vw, 96px)',
-          zIndex: 3, opacity: 0, textAlign: 'right', pointerEvents: 'none',
+          position: 'absolute', zIndex: 3, opacity: 0, pointerEvents: 'none',
+          ...(isMobile
+            ? { bottom: '6%', left: '50%', transform: 'translateX(-50%)', textAlign: 'center', width: '80vw' }
+            : { bottom: '18%', right: 'clamp(32px, 6vw, 96px)', textAlign: 'right' }),
         }}>
           <p style={{
             fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.20em',
@@ -417,9 +431,10 @@ export default function Hero() {
 
         {/* ── 3-axis arm text — appears at arm-level pause ── */}
         <div ref={armTextRef} style={{
-          position: 'absolute', top: '50%', right: 'clamp(32px, 6vw, 96px)',
-          transform: 'translateY(-50%)', zIndex: 3, opacity: 0, textAlign: 'right',
-          pointerEvents: 'none',
+          position: 'absolute', zIndex: 3, opacity: 0, pointerEvents: 'none',
+          ...(isMobile
+            ? { bottom: '6%', left: '50%', transform: 'translateX(-50%)', textAlign: 'center', width: '80vw' }
+            : { top: '50%', right: 'clamp(32px, 6vw, 96px)', transform: 'translateY(-50%)', textAlign: 'right' }),
         }}>
           <p style={{
             fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.20em',

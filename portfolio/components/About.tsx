@@ -97,8 +97,8 @@ export default function About() {
                     {item.company}
                   </p>
                   <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 4 }}>{item.role}</p>
-                  <p style={{ fontSize: 12, color: '#555', lineHeight: 1.6, marginBottom: 6 }}>{item.desc}</p>
-                  <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#3a3a3a' }}>{item.tags}</p>
+                  <p style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 6 }}>{item.desc}</p>
+                  <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#555' }}>{item.tags}</p>
                 </div>
               ))}
             </div>

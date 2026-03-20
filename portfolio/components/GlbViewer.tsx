@@ -92,7 +92,7 @@ export default function GlbViewer({
           position: 'absolute', top: 12, right: 12, zIndex: 10,
           fontFamily: 'var(--font-mono)', fontSize: 9, letterSpacing: '0.14em',
           textTransform: 'uppercase', background: 'none', border: 'none',
-          cursor: 'pointer', padding: '4px 0',
+          cursor: 'pointer', padding: '10px 12px',
           color: meshMode ? '#aaaaaa' : '#444',
           borderBottom: `1px solid ${meshMode ? '#444' : '#222'}`,
           transition: 'color 0.2s, border-color 0.2s',
