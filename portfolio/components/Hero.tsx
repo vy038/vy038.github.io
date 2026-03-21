@@ -243,24 +243,24 @@ export default function Hero() {
       scrollIndicatorRef.current.style.opacity = (Math.max(0, 1 - rawP / 0.06) * 0.3).toString()
     }
 
-    // Vision text: centered on HOLD zone raw 0.16–0.30 → fade in 0.14–0.20, out 0.27–0.32
+    // Vision text: fade in 0.20–0.26, hold, fade out 0.38–0.43
     if (camTextRef.current) {
-      const fadeIn  = Math.min(1, inv(0.14, 0.20, rawP))
-      const fadeOut = rawP > 0.27 ? Math.max(0, 1 - inv(0.27, 0.32, rawP)) : 1
+      const fadeIn  = Math.min(1, inv(0.20, 0.26, rawP))
+      const fadeOut = rawP > 0.38 ? Math.max(0, 1 - inv(0.38, 0.43, rawP)) : 1
       camTextRef.current.style.opacity = (fadeIn * fadeOut).toString()
     }
 
-    // Legs text: centered on HOLD zone raw 0.52–0.63 → fade in 0.50–0.56, out 0.60–0.65
+    // Legs text: fade in 0.50–0.56, hold, fade out 0.70–0.77
     if (legsTextRef.current) {
       const fadeIn  = Math.min(1, inv(0.50, 0.56, rawP))
-      const fadeOut = rawP > 0.60 ? Math.max(0, 1 - inv(0.60, 0.65, rawP)) : 1
+      const fadeOut = rawP > 0.67 ? Math.max(0, 1 - inv(0.67, 0.75, rawP)) : 1
       legsTextRef.current.style.opacity = (fadeIn * fadeOut).toString()
     }
 
-    // Arm text: centered on HOLD zone raw 0.74–0.84 → fade in 0.72–0.77, out 0.81–0.86
+    // Arm text: fade in 0.75–0.80, hold, fade out 0.88–0.95
     if (armTextRef.current) {
-      const fadeIn  = rawP >= 0.72 ? Math.min(1, inv(0.72, 0.77, rawP)) : 0
-      const fadeOut = rawP > 0.81 ? Math.max(0, 1 - inv(0.81, 0.86, rawP)) : 1
+      const fadeIn  = rawP >= 0.75 ? Math.min(1, inv(0.75, 0.80, rawP)) : 0
+      const fadeOut = rawP > 0.88 ? Math.max(0, 1 - inv(0.88, 0.93, rawP)) : 1
       armTextRef.current.style.opacity = (fadeIn * fadeOut).toString()
     }
 

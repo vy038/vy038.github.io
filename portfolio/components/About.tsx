@@ -121,7 +121,7 @@ export default function About() {
             BASc in Computer Engineering
           </p>
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#555', marginBottom: 6 }}>
-            Sep 2025 – May 2030 · 87.4% (3.81/4.0)
+            Sep 2025 – May 2030
           </p>
 
           <div style={{ marginTop: 40 }}>
