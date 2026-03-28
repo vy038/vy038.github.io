@@ -325,7 +325,6 @@ export default function Hero() {
           {[
             { label: 'GitHub', href: 'https://github.com/vy038' },
             { label: 'LinkedIn', href: 'https://linkedin.com/in/victoryu038' },
-            { label: 'Resume', href: '/VictorYu_Resume.pdf' },
           ].map((l) => (
             <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer"
               style={{ color: 'var(--muted)', transition: 'color 0.2s' }}

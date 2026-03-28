@@ -51,7 +51,6 @@ export default function Contact() {
         {[
           { label: 'GitHub', href: 'https://github.com/vy038' },
           { label: 'LinkedIn', href: 'https://linkedin.com/in/victoryu038' },
-          { label: 'Resume', href: '/VictorYu_Resume.pdf' },
         ].map((link) => (
           <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer"
             style={{
