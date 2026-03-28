@@ -9,4 +9,4 @@ portfolio/out/
 !portfolio/package.json
 !portfolio/package-lock.json
 
-.md
+*.md
