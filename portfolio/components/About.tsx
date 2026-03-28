@@ -14,8 +14,8 @@ const TIMELINE = [
   {
     year: 'Jan 2026 – Apr 2026',
     company: 'RBC',
-    role: 'Automation Analyst — Network Global Security SRE',
-    desc: 'Automating device configuration and monitoring with Python scripts and Airflow DAGs. Developed data pipeline for device onboarding, increasing data reliability by 90–95%.',
+    role: 'Software Developer — Network Security SRE',
+    desc: 'Automating device configuration and monitoring with real time dashboards and Airflow Python DAGs. Developed data pipeline for device onboarding, increasing data reliability by 90–95%.',
     tags: 'Python · MongoDB · PostgreSQL · Airflow',
   },
   {

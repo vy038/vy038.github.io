@@ -8,3 +8,5 @@ portfolio/out/
 # Allow portfolio manifests for CI
 !portfolio/package.json
 !portfolio/package-lock.json
+
+ai.md
